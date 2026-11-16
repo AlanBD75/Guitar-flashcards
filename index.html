@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#20242b"><title>Guitar Action Cards</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#20242b"><title>Guitar Action Cards – Version 3</title>
 <style>
 :root{color-scheme:light dark;--bg:#f3f4f6;--panel:#fff;--ink:#20242b;--muted:#626b78;--line:#d8dce2;--accent:#2457a7}
 @media(prefers-color-scheme:dark){:root{--bg:#171a1f;--panel:#232830;--ink:#f2f4f7;--muted:#b2bac5;--line:#414955;--accent:#477ed2}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:760px;margin:auto;padding:18px;display:grid;gap:14px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:16px}.top,.row,.modes,.controls,.checks{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.top{justify-content:space-between}h1{font-size:1.35rem;margin:0}h2{font-size:1.05rem;margin:0}.muted{color:var(--muted);font-size:.9rem}button,input{font:inherit}button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:10px 13px;cursor:pointer}button.primary{background:var(--accent);color:white;border-color:var(--accent)}button:disabled{opacity:.45}.modes button,.controls button{flex:1}.prompt{min-height:150px;display:grid;place-items:center;text-align:center;font-size:clamp(2rem,8vw,3.5rem);font-weight:750;overflow-wrap:anywhere;padding:18px 4px}.center{text-align:center}.sliderrow{display:flex;justify-content:space-between;font-weight:650}input[type=range]{width:100%;accent-color:var(--accent)}input[type=text]{min-width:0;flex:1;padding:11px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink)}.entry{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}.entry:last-child{border:0}.entry span{flex:1;min-width:0;overflow-wrap:anywhere}.small{padding:7px 10px;font-size:.9rem}.note{line-height:1.45}.hidden{display:none!important}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:760px;margin:auto;padding:18px;display:grid;gap:14px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:16px}.top,.row,.modes,.controls,.checks{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.top{justify-content:space-between}h1{font-size:1.35rem;margin:0}h2{font-size:1.05rem;margin:0}.muted{color:var(--muted);font-size:.9rem}button,input{font:inherit}button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:10px 13px;cursor:pointer}button.primary{background:var(--accent);color:white;border-color:var(--accent)}button:disabled{opacity:.45}.modes button,.controls button{flex:1}.prompt{min-height:150px;display:grid;place-items:center;text-align:center;font-size:clamp(2rem,8vw,3.5rem);font-weight:750;overflow-wrap:anywhere;padding:18px 4px}.center{text-align:center}.sliderrow{display:flex;justify-content:space-between;font-weight:650}input[type=range]{width:100%;accent-color:var(--accent)}input[type=text],input[type=email]{min-width:0;flex:1;padding:11px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink)}.entry{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}.entry:last-child{border:0}.entry span{flex:1;min-width:0;overflow-wrap:anywhere}.small{padding:7px 10px;font-size:.9rem}.note{line-height:1.45}.hidden{display:none!important}
 </style></head><body><main>
-<div class="top"><h1>Guitar Action Cards</h1><span class="muted">Personal practice tool</span></div>
+<div class="top"><h1>Guitar Action Cards</h1><span class="muted">Version 3 · Automatic Sync</span></div>
 <section class="panel">
 <div class="top"><h2>Practice mode</h2><div class="modes"><button id="chords" class="primary">Chords</button><button id="scales">Scales</button></div></div>
 <div class="prompt" id="prompt" aria-live="polite">Ready to practise?</div><p class="muted center" id="status">Choose a mode and press Start</p>
@@ -15,23 +15,271 @@
 <section class="panel"><div class="sliderrow"><span>Time per card</span><span id="seconds">5 seconds</span></div><input id="interval" type="range" min="1" max="20" step="1" value="5"><div class="top muted"><span>1 second</span><span>20 seconds</span></div></section>
 <section class="panel">
 <div class="top"><h2 id="listtitle">My chords</h2><span class="muted" id="count"></span></div>
-<p class="muted note">Enter each name exactly as you want it displayed and spoken. For example, enter “A” or “A major”. Your lists are saved automatically in this browser on this device.</p>
+<p class="muted note">Enter each name exactly as you want it displayed and spoken. For example, enter “A” or “A major”. Your lists save on this device. Use Export my lists to make a backup.</p>
 <div class="row"><input id="newname" type="text" placeholder="Enter a chord name" aria-label="New chord or scale name"><button id="add" class="primary">Add</button></div>
 <div id="list" style="margin-top:10px"></div><p class="muted" id="message" aria-live="polite"></p>
 <div class="row"><button id="reset" class="small">Restore starter list</button><button id="export" class="small">Export my lists</button><button id="import" class="small">Import lists</button><input id="importfile" type="file" accept="application/json,.json" class="hidden"></div>
-</section><p class="muted note">Use Export my lists to make a backup or move your custom chords and scales to another device. Import that backup on the other device.</p>
+</section>
+<section class="panel" aria-labelledby="synctitle">
+<h2 id="synctitle">Automatic sync</h2>
+<p class="muted note" id="syncstatus" role="status">Sign in with the same email on both devices to sync your lists.</p>
+<form id="signinform" class="row">
+<input id="syncemail" type="email" required autocomplete="email" placeholder="Email address" aria-label="Email address">
+<button id="sendlink" type="submit" class="primary">Email me a sign-in link</button>
+</form>
+<div class="row"><span id="accountemail" class="muted"></span><button id="signout" class="hidden" type="button">Sign out on this device</button></div>
+<div id="syncconflict" class="hidden">
+<p id="conflictlabel"></p>
+<div class="row"><button id="keepdevice" type="button">Keep this device’s list</button><button id="usecloud" type="button">Use the synced list</button></div>
+</div>
+</section>
 </main>
+<script defer id="supabase-sdk" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.89.0" integrity="sha384-sswy/fskVqlKgAPomlHiO13oYoOHIdx4y/lsMDp/rQ3loCXIcRpV4U4rp2TVCqKj" crossorigin="anonymous"></script>
 <script>
 (()=> {
 const $=id=>document.getElementById(id),KEY='guitarActionCardsLibrary_v1';
 const starter={chords:['A major','G major','E minor','E major','D minor','C major','A minor','D major'],scales:['A major scale','E minor scale','A minor pentatonic','E minor pentatonic','G major scale','Blues scale']};
 const valid=x=>x&&Array.isArray(x.chords)&&Array.isArray(x.scales)&&x.chords.every(s=>typeof s==='string')&&x.scales.every(s=>typeof s==='string');
-let lists=(()=>{try{let x=JSON.parse(localStorage.getItem(KEY));if(valid(x))return x}catch(e){}return {chords:[...starter.chords],scales:[...starter.scales]}})();
+const PROJECT_URL = 'https://vvxffheajenohbbreruy.supabase.co';
+const PUBLIC_KEY = 'sb_publishable__mN9kAyTQ4PdrlwvqzFnYw_66gw6qI1';
+const SITE_URL = 'https://alanbd75.github.io/guitar-action-cards/';
+const LIST_TYPES = ['chords', 'scales'];
+const GUEST_KEY = 'guitarActionCardsV3:guest';
+const accountKey = id => 'guitarActionCardsV3:account:' + id;
+const columns = 'chords,scales,updated_at';
+const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const copyLists = source => ({chords: [...source.chords], scales: [...source.scales]});
+const readLocal = key => {
+  try { return JSON.parse(localStorage.getItem(key)); } catch { return null; }
+};
+const cloudStatus = text => { $('syncstatus').textContent = text; };
+let account = null, syncing = false, syncAgain = false, conflict = null, supabaseClient;
+
+function persistLists() {
+  try {
+    if (account) {
+      localStorage.setItem(accountKey(account.id), JSON.stringify({lists, base: account.base}));
+    } else {
+      localStorage.setItem(GUEST_KEY, JSON.stringify(lists));
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function showLists(incoming) {
+  lists = copyLists(incoming);
+  lastIndex = -1;
+  draw();
+}
+
+function clearConflict() {
+  conflict = null;
+  $('syncconflict').classList.add('hidden');
+}
+
+function showConflict(active, type, remote) {
+  conflict = {active, type, remote: [...remote]};
+  $('conflictlabel').textContent = 'Both devices changed your ' + type + '. Export a backup if you want to keep a copy of these lists.';
+  $('syncconflict').classList.remove('hidden');
+  cloudStatus('Sync paused until you choose a list.');
+}
+
+function resolveConflict(useCloud) {
+  if (!conflict || account !== conflict.active) return;
+  const {type, remote} = conflict;
+  account.base[type] = remote;
+  if (useCloud) showLists({...lists, [type]: remote});
+  persistLists();
+  clearConflict();
+  requestSync();
+}
+
+function requestSync() {
+  if (!account || conflict || document.hidden || $('list').querySelector('input')) return;
+  syncAgain = true;
+  if (!syncing) void syncLists();
+}
+
+async function syncLists() {
+  syncing = true;
+  try {
+    while (syncAgain && account && !conflict && !document.hidden && !$('list').querySelector('input')) {
+      syncAgain = false;
+      await syncOnce(account);
+    }
+  } finally {
+    syncing = false;
+  }
+}
+
+async function syncOnce(active) {
+  try {
+    const table = () => supabaseClient.from('guitar_libraries');
+    const result = await table().select(columns).eq('user_id', active.id).maybeSingle();
+    if (account !== active || conflict || $('list').querySelector('input')) return;
+    if (result.error) throw result.error;
+    const remote = result.data;
+    if (remote && (!valid(remote) || !Number.isFinite(Date.parse(remote.updated_at)))) {
+      throw new Error('Invalid cloud library data');
+    }
+
+    const snapshot = copyLists(lists);
+    const merged = copyLists(lists);
+    if (remote) {
+      for (const type of LIST_TYPES) {
+        const localChanged = !equal(snapshot[type], active.base[type]);
+        const cloudChanged = !equal(remote[type], active.base[type]);
+        if (localChanged && cloudChanged && !equal(snapshot[type], remote[type])) {
+          showConflict(active, type, remote[type]);
+          return;
+        }
+        if (!localChanged) merged[type] = remote[type];
+      }
+    }
+
+    let saved = remote;
+    if (!remote || !equal(merged, copyLists(remote))) {
+      if (!remote) {
+        const insert = await table().insert({user_id: active.id, ...merged}).select(columns).single();
+        if (account !== active) return;
+        if (insert.error?.code === '23505') return;
+        if (insert.error) throw insert.error;
+        saved = insert.data;
+      } else {
+        const updatedAt = new Date(Math.max(Date.now(), Date.parse(remote.updated_at) + 1)).toISOString();
+        const update = await table().update({...merged, updated_at: updatedAt})
+          .eq('user_id', active.id).eq('updated_at', remote.updated_at).select(columns).maybeSingle();
+        if (account !== active) return;
+        if (update.error) throw update.error;
+        if (!update.data) return;
+        saved = update.data;
+      }
+    }
+
+    const nextLists = copyLists(lists);
+    for (const type of LIST_TYPES) {
+      if (equal(lists[type], snapshot[type])) nextLists[type] = saved[type];
+    }
+
+    // Leave an open edit intact. Reconcile against the written version on the next check.
+    if ($('list').querySelector('input')) {
+      for (const type of LIST_TYPES) {
+        if (equal(snapshot[type], saved[type])) active.base[type] = saved[type];
+      }
+      persistLists();
+      return;
+    }
+    active.base = copyLists(saved);
+    if (!equal(lists, nextLists)) showLists(nextLists);
+    persistLists();
+    if (!equal(lists, active.base)) requestSync();
+    else cloudStatus('Lists synced at ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}));
+  } catch {
+    if (account === active) cloudStatus('Sync could not reach or update Supabase. This device will retry automatically.');
+  }
+}
+
+function updateAccount(session) {
+  const user = session?.user;
+  if ((user?.id || null) !== (account?.id || null)) {
+    clearConflict();
+    if (user) {
+      const cached = readLocal(accountKey(user.id));
+      const guest = copyLists(listsForGuest());
+      account = {id: user.id, base: valid(cached?.base) ? copyLists(cached.base) : guest};
+      showLists(valid(cached?.lists) ? cached.lists : guest);
+      cloudStatus('Checking your synced lists…');
+    } else {
+      account = null;
+      showLists(listsForGuest());
+    }
+  }
+  $('signinform').classList.toggle('hidden', Boolean(user));
+  $('signout').classList.toggle('hidden', !user);
+  $('accountemail').textContent = user ? 'Signed in as ' + user.email : '';
+  if (user) requestSync();
+  else if (!$('syncstatus').textContent.includes('link')) cloudStatus('Sign in with the same email on both devices to sync your lists.');
+}
+
+function listsForGuest() {
+  const guest = readLocal(GUEST_KEY);
+  const previous = readLocal(KEY);
+  return valid(guest) ? guest : valid(previous) ? previous : starter;
+}
+
+function setupSync() {
+  if (location.origin !== new URL(SITE_URL).origin || !location.pathname.startsWith(new URL(SITE_URL).pathname)) {
+    $('signinform').classList.add('hidden');
+    cloudStatus('Open the published GitHub Pages app to sign in and sync.');
+    return;
+  }
+  if (!window.supabase) {
+    $('signinform').classList.add('hidden');
+    cloudStatus('Sign-in could not load. Check your connection and reload this page.');
+    return;
+  }
+  supabaseClient = window.supabase.createClient(PROJECT_URL, PUBLIC_KEY, {
+    auth: {flowType: 'pkce', storageKey: 'guitar-action-cards-v3-auth'}
+  });
+  supabaseClient.auth.onAuthStateChange((_event, session) => {
+    setTimeout(() => updateAccount(session), 0);
+  });
+  if (new URLSearchParams(location.hash.slice(1)).has('error')) {
+    cloudStatus('This sign-in link could not be used. Request a fresh link.');
+    history.replaceState(null, '', location.pathname);
+  }
+  $('signinform').onsubmit = async event => {
+    event.preventDefault();
+    $('sendlink').disabled = true;
+    try {
+      const {error} = await supabaseClient.auth.signInWithOtp({
+        email: $('syncemail').value.trim(),
+        options: {emailRedirectTo: SITE_URL}
+      });
+      if (error) throw error;
+      cloudStatus('Check your email. Open the newest sign-in link in the same browser on this device.');
+    } catch {
+      cloudStatus('Could not send a sign-in link. Check your email address and try again.');
+    } finally {
+      $('sendlink').disabled = false;
+    }
+  };
+  $('signout').onclick = async () => {
+    $('signout').disabled = true;
+    try {
+      const {error} = await supabaseClient.auth.signOut({scope: 'local'});
+      if (error) throw error;
+    } catch {
+      cloudStatus('Could not sign out. Check your connection and retry.');
+    } finally {
+      $('signout').disabled = false;
+    }
+  };
+  $('keepdevice').onclick = () => resolveConflict(false);
+  $('usecloud').onclick = () => resolveConflict(true);
+  window.addEventListener('online', requestSync);
+  window.addEventListener('focus', requestSync);
+  document.addEventListener('visibilitychange', requestSync);
+  setInterval(requestSync, 5000);
+}
+
+let lists=copyLists(listsForGuest());
 let mode='chords',current='',lastIndex=-1,timer=null,running=false,paused=false,deadline=0,remaining=5,timerToken=0,advancing=false;
 const items=()=>lists[mode],secs=()=>+ $('interval').value;
-function save(){try{localStorage.setItem(KEY,JSON.stringify(lists));$('message').textContent='Saved on this device.'}catch(e){$('message').textContent='Browser storage unavailable here. Please export a backup.'}}
+function save(){
+  if (!persistLists()) {
+    $('message').textContent='Browser storage is unavailable. Export a backup to keep these changes.';
+    requestSync();
+    return false;
+  }
+  $('message').textContent='Saved on this device.';
+  requestSync();
+  return true;
+}
 function say(s){if(!$('speak').checked||!('speechSynthesis'in window))return;speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(s);u.rate=.9;speechSynthesis.speak(u)}
-function draw(){$('listtitle').textContent=mode==='chords'?'My chords':'My scales';$('count').textContent=items().length+' entries';$('newname').placeholder=mode==='chords'?'Enter a chord name':'Enter a scale name';$('list').replaceChildren();items().forEach((name,i)=>{let row=document.createElement('div');row.className='entry';let label=document.createElement('span');label.textContent=name;let edit=document.createElement('button');edit.className='small';edit.textContent='Edit';let del=document.createElement('button');del.className='small';del.textContent='Delete';edit.onclick=()=>editRow(row,i,name);del.onclick=()=>{lists[mode].splice(i,1);if(current===name){current='';$('prompt').textContent='Choose Next for another card.'}save();draw();$('message').textContent='Entry deleted and saved.'};row.append(label,edit,del);$('list').append(row)});if(!items().length){let p=document.createElement('p');p.className='muted';p.textContent='No entries yet. Add one above.';$('list').append(p)}}
+function draw(){$('listtitle').textContent=mode==='chords'?'My chords':'My scales';$('count').textContent=items().length+' entries';$('newname').placeholder=mode==='chords'?'Enter a chord name':'Enter a scale name';$('list').replaceChildren();items().forEach((name,i)=>{let row=document.createElement('div');row.className='entry';let label=document.createElement('span');label.textContent=name;let edit=document.createElement('button');edit.className='small';edit.textContent='Edit';let del=document.createElement('button');del.className='small';del.textContent='Delete';edit.onclick=()=>editRow(row,i,name);del.onclick=()=>{lists[mode].splice(i,1);if(current===name){current='';$('prompt').textContent='Choose Next for another card.'}let saved=save();draw();if(saved)$('message').textContent='Entry deleted and saved.'};row.append(label,edit,del);$('list').append(row)});if(!items().length){let p=document.createElement('p');p.className='muted';p.textContent='No entries yet. Add one above.';$('list').append(p)}}
 function editRow(row,i,old){row.replaceChildren();let inp=document.createElement('input');inp.type='text';inp.value=old;let saveBtn=document.createElement('button');saveBtn.className='small primary';saveBtn.textContent='Save';let cancel=document.createElement('button');cancel.className='small';cancel.textContent='Cancel';let commit=()=>{let v=inp.value.trim();if(!v){$('message').textContent='Please enter a name.';inp.focus();return}lists[mode][i]=v;if(current===old){current=v;$('prompt').textContent=v}save();draw()};saveBtn.onclick=commit;cancel.onclick=draw;inp.onkeydown=e=>{if(e.key==='Enter')commit();if(e.key==='Escape')draw()};row.append(inp,saveBtn,cancel);inp.focus();inp.select()}
 function next(){let a=items();if(!a.length){$('prompt').textContent='Add some '+mode+' first';return false}let i=0;if($('random').checked&&a.length>1){do{i=Math.floor(Math.random()*a.length)}while(i===lastIndex)}else i=(lastIndex+1)%a.length;lastIndex=i;current=a[i];$('prompt').textContent=current;say(current);return true}
 function clear(){timerToken++;if(timer!==null){clearTimeout(timer);timer=null}}
@@ -66,12 +314,13 @@ function start(){if(!items().length){next();return}if(!current||!items().include
 function pause(){if(!running)return;remaining=Math.max(1,Math.ceil((deadline-Date.now())/1000));clear();running=false;paused=true;status()}
 function stop(){clear();running=false;paused=false;advancing=false;remaining=secs();$('status').textContent='Stopped';if('speechSynthesis'in window)speechSynthesis.cancel()}
 function switchMode(m){if(mode===m)return;stop();mode=m;current='';lastIndex=-1;$('chords').classList.toggle('primary',m==='chords');$('scales').classList.toggle('primary',m==='scales');$('prompt').textContent='Ready to practise '+m;$('status').textContent='Choose Start when ready';draw()}
-$('chords').onclick=()=>switchMode('chords');$('scales').onclick=()=>switchMode('scales');$('start').onclick=start;$('next').onclick=()=>{clear();if(next()&&running)clock(secs())};$('pause').onclick=()=>running?pause():paused?clock(remaining):null;$('stop').onclick=stop;
+$('chords').onclick=()=>switchMode('chords');$('scales').onclick=()=>switchMode('scales');$('start').onclick=start;$('next').onclick=()=>{clear();if(next()&&running)clock(secs());else if(running)stop()};$('pause').onclick=()=>running?pause():paused?clock(remaining):null;$('stop').onclick=stop;
 $('interval').oninput=()=>{$('seconds').textContent=secs()+(secs()===1?' second':' seconds');if(running)clock(secs())};
-$('add').onclick=()=>{let v=$('newname').value.trim();if(!v){$('message').textContent='Please enter a name first.';return}items().push(v);$('newname').value='';save();draw();$('message').textContent='Added and saved: '+v};$('newname').onkeydown=e=>{if(e.key==='Enter')$('add').click()};
-$('reset').onclick=()=>{lists[mode]=[...starter[mode]];current='';lastIndex=-1;save();draw();$('message').textContent='Starter list restored and saved.'};
+$('add').onclick=()=>{let v=$('newname').value.trim();if(!v){$('message').textContent='Please enter a name first.';return}items().push(v);$('newname').value='';let saved=save();draw();if(saved)$('message').textContent='Added and saved: '+v};$('newname').onkeydown=e=>{if(e.key==='Enter')$('add').click()};
+$('reset').onclick=()=>{lists[mode]=[...starter[mode]];current='';lastIndex=-1;let saved=save();draw();if(saved)$('message').textContent='Starter list restored and saved.'};
 $('export').onclick=()=>{let blob=new Blob([JSON.stringify(lists,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='guitar-action-cards-lists.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);$('message').textContent='Library backup exported.'};
-$('import').onclick=()=>$('importfile').click();$('importfile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let x=JSON.parse(await f.text());if(!valid(x))throw Error();lists={chords:x.chords,scales:x.scales};current='';lastIndex=-1;save();draw();$('message').textContent='Lists imported and saved.'}catch(err){$('message').textContent='Could not import that file. Choose a valid exported library.'}e.target.value=''};
+$('import').onclick=()=>$('importfile').click();$('importfile').onchange=async e=>{let f=e.target.files[0];if(!f)return;const importingFor=account;try{let x=JSON.parse(await f.text());if(account!==importingFor)return;if(!valid(x))throw Error();lists={chords:x.chords,scales:x.scales};current='';lastIndex=-1;let saved=save();draw();if(saved)$('message').textContent='Lists imported and saved.'}catch(err){$('message').textContent='Could not import that file. Choose a valid exported library.'}finally{e.target.value=''}};
 $('seconds').textContent='5 seconds';draw();
+window.addEventListener('DOMContentLoaded', setupSync, {once: true});
 })();
 </script></body></html>
