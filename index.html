@@ -27,18 +27,46 @@ const $=id=>document.getElementById(id),KEY='guitarActionCardsLibrary_v1';
 const starter={chords:['A major','G major','E minor','E major','D minor','C major','A minor','D major'],scales:['A major scale','E minor scale','A minor pentatonic','E minor pentatonic','G major scale','Blues scale']};
 const valid=x=>x&&Array.isArray(x.chords)&&Array.isArray(x.scales)&&x.chords.every(s=>typeof s==='string')&&x.scales.every(s=>typeof s==='string');
 let lists=(()=>{try{let x=JSON.parse(localStorage.getItem(KEY));if(valid(x))return x}catch(e){}return {chords:[...starter.chords],scales:[...starter.scales]}})();
-let mode='chords',current='',lastIndex=-1,timer=null,running=false,paused=false,deadline=0,remaining=5;
+let mode='chords',current='',lastIndex=-1,timer=null,running=false,paused=false,deadline=0,remaining=5,timerToken=0,advancing=false;
 const items=()=>lists[mode],secs=()=>+ $('interval').value;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(lists));$('message').textContent='Saved on this device.'}catch(e){$('message').textContent='Browser storage unavailable here. Please export a backup.'}}
 function say(s){if(!$('speak').checked||!('speechSynthesis'in window))return;speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(s);u.rate=.9;speechSynthesis.speak(u)}
 function draw(){$('listtitle').textContent=mode==='chords'?'My chords':'My scales';$('count').textContent=items().length+' entries';$('newname').placeholder=mode==='chords'?'Enter a chord name':'Enter a scale name';$('list').replaceChildren();items().forEach((name,i)=>{let row=document.createElement('div');row.className='entry';let label=document.createElement('span');label.textContent=name;let edit=document.createElement('button');edit.className='small';edit.textContent='Edit';let del=document.createElement('button');del.className='small';del.textContent='Delete';edit.onclick=()=>editRow(row,i,name);del.onclick=()=>{lists[mode].splice(i,1);if(current===name){current='';$('prompt').textContent='Choose Next for another card.'}save();draw();$('message').textContent='Entry deleted and saved.'};row.append(label,edit,del);$('list').append(row)});if(!items().length){let p=document.createElement('p');p.className='muted';p.textContent='No entries yet. Add one above.';$('list').append(p)}}
 function editRow(row,i,old){row.replaceChildren();let inp=document.createElement('input');inp.type='text';inp.value=old;let saveBtn=document.createElement('button');saveBtn.className='small primary';saveBtn.textContent='Save';let cancel=document.createElement('button');cancel.className='small';cancel.textContent='Cancel';let commit=()=>{let v=inp.value.trim();if(!v){$('message').textContent='Please enter a name.';inp.focus();return}lists[mode][i]=v;if(current===old){current=v;$('prompt').textContent=v}save();draw()};saveBtn.onclick=commit;cancel.onclick=draw;inp.onkeydown=e=>{if(e.key==='Enter')commit();if(e.key==='Escape')draw()};row.append(inp,saveBtn,cancel);inp.focus();inp.select()}
 function next(){let a=items();if(!a.length){$('prompt').textContent='Add some '+mode+' first';return false}let i=0;if($('random').checked&&a.length>1){do{i=Math.floor(Math.random()*a.length)}while(i===lastIndex)}else i=(lastIndex+1)%a.length;lastIndex=i;current=a[i];$('prompt').textContent=current;say(current);return true}
-function clear(){if(timer)clearInterval(timer);timer=null}function status(){$('status').textContent=paused?'Paused':running?'Next card in '+Math.max(0,Math.ceil((deadline-Date.now())/1000))+' seconds':'Not running'}
-function clock(n){clear();remaining=n;deadline=Date.now()+n*1000;running=true;paused=false;status();timer=setInterval(()=>{let left=Math.max(0,Math.ceil((deadline-Date.now())/1000));$('status').textContent='Next card in '+left+' seconds';if(Date.now()>=deadline){if($('auto').checked){if(next())clock(secs());else stop()}else pause()}},200)}
-function start(){if(!items().length){next();return}if(!current||!items().includes(current))next();clock(secs())}function pause(){if(!running)return;remaining=Math.max(1,Math.ceil((deadline-Date.now())/1000));clear();running=false;paused=true;status()}function stop(){clear();running=false;paused=false;remaining=secs();$('status').textContent='Stopped';if('speechSynthesis'in window)speechSynthesis.cancel()}
+function clear(){timerToken++;if(timer!==null){clearTimeout(timer);timer=null}}
+function status(){$('status').textContent=paused?'Paused':running?'Next card in '+Math.max(0,Math.ceil((deadline-Date.now())/1000))+' seconds':'Not running'}
+function schedule(token){
+  if(!running||token!==timerToken)return;
+  const msLeft=deadline-Date.now();
+  if(msLeft<=0){
+    timer=null;
+    if(advancing)return;
+    advancing=true;
+    if($('auto').checked){
+      const ok=next();
+      advancing=false;
+      if(ok)clock(secs());else stop();
+    }else{advancing=false;pause();}
+    return;
+  }
+  $('status').textContent='Next card in '+Math.max(1,Math.ceil(msLeft/1000))+' seconds';
+  timer=setTimeout(()=>schedule(token),Math.min(200,msLeft));
+}
+function clock(n){
+  clear();
+  remaining=Math.max(1,n);
+  deadline=Date.now()+remaining*1000;
+  running=true;paused=false;
+  const token=timerToken;
+  status();
+  schedule(token);
+}
+function start(){if(!items().length){next();return}if(!current||!items().includes(current))next();clock(secs())}
+function pause(){if(!running)return;remaining=Math.max(1,Math.ceil((deadline-Date.now())/1000));clear();running=false;paused=true;status()}
+function stop(){clear();running=false;paused=false;advancing=false;remaining=secs();$('status').textContent='Stopped';if('speechSynthesis'in window)speechSynthesis.cancel()}
 function switchMode(m){if(mode===m)return;stop();mode=m;current='';lastIndex=-1;$('chords').classList.toggle('primary',m==='chords');$('scales').classList.toggle('primary',m==='scales');$('prompt').textContent='Ready to practise '+m;$('status').textContent='Choose Start when ready';draw()}
-$('chords').onclick=()=>switchMode('chords');$('scales').onclick=()=>switchMode('scales');$('start').onclick=start;$('next').onclick=()=>{if(next()&&running)clock(secs())};$('pause').onclick=()=>running?pause():paused?clock(remaining):null;$('stop').onclick=stop;
+$('chords').onclick=()=>switchMode('chords');$('scales').onclick=()=>switchMode('scales');$('start').onclick=start;$('next').onclick=()=>{clear();if(next()&&running)clock(secs())};$('pause').onclick=()=>running?pause():paused?clock(remaining):null;$('stop').onclick=stop;
 $('interval').oninput=()=>{$('seconds').textContent=secs()+(secs()===1?' second':' seconds');if(running)clock(secs())};
 $('add').onclick=()=>{let v=$('newname').value.trim();if(!v){$('message').textContent='Please enter a name first.';return}items().push(v);$('newname').value='';save();draw();$('message').textContent='Added and saved: '+v};$('newname').onkeydown=e=>{if(e.key==='Enter')$('add').click()};
 $('reset').onclick=()=>{lists[mode]=[...starter[mode]];current='';lastIndex=-1;save();draw();$('message').textContent='Starter list restored and saved.'};
